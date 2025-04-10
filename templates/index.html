@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Detect deepfake audio using AI. Upload a file to analyze whether it's real or fake.">
+    <meta name="keywords" content="Deepfake, AI, Audio Detection, Fake Audio">
+    <title>Deepfake Audio Detection</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i>
+            <h2>AudioGuard</h2>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="active"><i class="fas fa-home"></i> <span>Home</span></a>
+            <a href="#"><i class="fas fa-info-circle"></i> <span>About</span></a>
+            <a href="#"><i class="fas fa-envelope"></i> <span>Contact</span></a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Detect <span class="highlight">Deepfake Audio</span> with AI</h1>
+            <p class="subtitle">Our cutting-edge AI technology analyzes audio patterns to identify synthetic or
+                manipulated voice recordings.</p>
+
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-bolt"></i>
+                    <span>Real-time Analysis</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-lock"></i>
+                    <span>Privacy Protected</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-chart-line"></i>
+                    <span>95% Accuracy</span>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="upload-container">
+                <h3><i class="fas fa-headphones-alt"></i> Upload Your Audio</h3>
+                <div id="flash-messages" class="flash-messages"></div>
+                <div class="upload-box">
+                    <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
+                        <div class="file-area">
+                            <label for="file-upload" class="custom-file-upload">
+                                <i class="fas fa-cloud-upload-alt"></i> Choose Audio File
+                            </label>
+                            <span id="file-name">No file chosen</span>
+                            <input id="file-upload" type="file" name="audio" accept="audio/*" required>
+                        </div>
+                        <button type="submit" class="analyze-btn">
+                            <i class="fas fa-microscope"></i> Analyze Audio
+                        </button>
+                    </form>
+                </div>
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <span>Analyzing audio patterns...</span>
+                </div>
+                <div id="result-box" class="result-box">
+                    <div class="result-icon"></div>
+                    <div class="result-text"></div>
+                    <div class="confidence-meter">
+                        <div class="confidence-bar"></div>
+                        <div class="confidence-label"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="how-it-works">
+        <h2>How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-icon"><i class="fas fa-file-audio"></i></div>
+                <h3>Upload</h3>
+                <p>Upload any audio file in WAV, MP3, or FLAC format</p>
+            </div>
+            <div class="step">
+                <div class="step-icon"><i class="fas fa-brain"></i></div>
+                <h3>AI Analysis</h3>
+                <p>Our neural network examines spectral patterns and acoustic features</p>
+            </div>
+            <div class="step">
+                <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                <h3>Get Results</h3>
+                <p>Receive instant verdict with confidence score</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>AudioGuard</h3>
+                <p>Fighting misinformation in the age of synthetic media with advanced deep learning technology.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Home</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> About</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> API</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p><i class="fas fa-envelope"></i> hello@audioguard.ai</p>
+                <p><i class="fas fa-map-marker-alt"></i> San Francisco, CA</p>
+                <p><i class="fas fa-code-branch"></i> Open Source Project</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 AudioGuard | Deepfake Detection Tool</p>
+        </div>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle" id="dark-mode-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>

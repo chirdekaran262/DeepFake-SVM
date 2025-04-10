@@ -1,0 +1,47 @@
+# Ignore audio dataset
+/audio_dataset/
+/data/
+/dataset/
+/samples/
+
+# Ignore audio files (common formats)
+*.wav
+*.mp3
+*.flac
+*.aac
+*.ogg
+
+
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+venv/
+.env/
+.env
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+.env
+.DS_Store
+
