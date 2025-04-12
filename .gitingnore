@@ -3,7 +3,7 @@
 /data/
 /dataset/
 /samples/
-DeepFakeAudio/
+venv/
 
 # Ignore audio files (common formats)
 *.wav

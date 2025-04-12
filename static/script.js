@@ -102,9 +102,28 @@ document.addEventListener("DOMContentLoaded", function () {
         const icon = darkModeToggle.querySelector("i");
         if (body.classList.contains("dark-mode")) {
             icon.className = "fas fa-sun";
+            localStorage.setItem("theme", "dark");
         } else {
             icon.className = "fas fa-moon";
+            localStorage.setItem("theme", "light");
         }
+    });
+
+    // Apply saved theme on page load
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+        body.classList.add("dark-mode");
+        darkModeToggle.querySelector("i").className = "fas fa-sun";
+    } else {
+        darkModeToggle.querySelector("i").className = "fas fa-moon";
+    }
+
+    // Hamburger menu toggle
+    const hamburger = document.querySelector(".hamburger");
+    const navLinks = document.querySelector(".nav-links");
+
+    hamburger.addEventListener("click", function () {
+        navLinks.classList.toggle("active");
     });
 
     // Display the analysis result
