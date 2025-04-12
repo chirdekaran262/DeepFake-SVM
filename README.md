@@ -1,3 +1,19 @@
+---
+title: Simple Audio Predictor Test
+emoji: 🔊
+colorFrom: blue
+colorTo: green
+sdk: gradio
+app_file: app.py
+pinned: false
+---
+
+# Alternative Docker Deployment
+For Docker-based deployment, change the SDK configuration to:
+```
+sdk: docker
+```
+
 # 🎧 DeepFake Audio Detection using SVM
 
 Detect whether an audio file is real or fake using MFCC features and a Support Vector Machine (SVM) classifier.

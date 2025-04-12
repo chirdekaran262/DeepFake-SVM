@@ -1,3 +1,5 @@
+Dockerfile
+.gradio/
 # Ignore audio dataset
 /audio_dataset/
 /data/
