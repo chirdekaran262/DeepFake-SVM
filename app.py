@@ -127,8 +127,15 @@ def analyze_audio(audio_file):
         label = "Real" if prediction == 0 else "Fake"
         confidence_text = f"{confidence:.2f}%"
         logger.info(f"Prediction: {label}, Confidence: {confidence_text}")
+        
+        # Create the result message with appropriate styling
+        result_message = ""
+        if label == "Fake":
+            result_message = f"<div style='background-color: #ffebee; border-left: 5px solid #f44336; padding: 15px; margin: 10px 0; border-radius: 4px;'><span style='color: #d32f2f; font-weight: bold; font-size: 18px;'>⚠️ WARNING: AI-GENERATED AUDIO DETECTED</span><br><span style='color: #d32f2f;'>This audio file appears to be artificially generated with {confidence_text} confidence.</span></div>"
+        else:
+            result_message = f"<div style='background-color: #e8f5e9; border-left: 5px solid #4caf50; padding: 15px; margin: 10px 0; border-radius: 4px;'><span style='color: #2e7d32; font-weight: bold; font-size: 18px;'>✓ AUTHENTIC AUDIO</span><br><span style='color: #2e7d32;'>This audio file appears to be authentic with {confidence_text} confidence.</span></div>"
                 
-        return label, confidence_text
+        return label, confidence_text, result_message
         
     except Exception as e:
         logger.error(f"Error in analyze_audio: {e}")
@@ -141,7 +148,8 @@ demo = gr.Interface(
     inputs=gr.Audio(type="filepath", label="Upload Audio"),
     outputs=[
         gr.Label(label="Prediction"),
-        gr.Text(label="Confidence")
+        gr.Text(label="Confidence"),
+        gr.HTML(label="Analysis Result")
     ],
     title="DeepFake Audio Detection",
     description="Upload an audio file to check if it's real or AI-generated (fake).",
