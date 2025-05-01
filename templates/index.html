@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepFake Audio Detector</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --success-color: #10b981;
+            --success-light: #d1fae5;
+            --danger-color: #ef4444;
+            --danger-light: #fee2e2;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        
+        .audio-wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+        }
+        
+        .audio-wave span {
+            display: inline-block;
+            width: 4px;
+            margin: 0 2px;
+            border-radius: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .audio-wave.real span {
+            background-color: var(--success-color);
+        }
+        
+        .audio-wave.fake span {
+            background-color: var(--danger-color);
+        }
+        
+        .audio-wave span:nth-child(1) { height: 60%; animation: wave 1s ease-in-out infinite; }
+        .audio-wave span:nth-child(2) { height: 30%; animation: wave 1.2s ease-in-out infinite; }
+        .audio-wave span:nth-child(3) { height: 75%; animation: wave 1.1s ease-in-out infinite; }
+        .audio-wave span:nth-child(4) { height: 45%; animation: wave 0.9s ease-in-out infinite; }
+        .audio-wave span:nth-child(5) { height: 80%; animation: wave 1.3s ease-in-out infinite; }
+        .audio-wave span:nth-child(6) { height: 40%; animation: wave 0.8s ease-in-out infinite; }
+        .audio-wave span:nth-child(7) { height: 55%; animation: wave 1.4s ease-in-out infinite; }
+        .audio-wave span:nth-child(8) { height: 70%; animation: wave 1s ease-in-out infinite; }
+        
+        @keyframes wave {
+            0%, 100% {
+                transform: scaleY(1);
+            }
+            50% {
+                transform: scaleY(0.5);
+            }
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring__circle {
+            stroke-dasharray: 283;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        
+        .drop-zone {
+            border: 2px dashed #e2e8f0;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone:hover, .drop-zone.active {
+            border-color: var(--primary-color);
+            background-color: #f8fafc;
+        }
+        
+        .result-card {
+            transition: all 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="audio-wave mr-3">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <h1 class="text-2xl font-bold text-indigo-600">DeepFake Audio Detector</h1>
+                    </div>
+                    <div>
+                        <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Introduction -->
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold mb-2">Verify Audio Authenticity</h2>
+                    <p class="text-gray-600 max-w-3xl">
+                        Our advanced AI model analyzes audio signatures and patterns to detect artificially generated speech.
+                        Upload your audio file to determine if it's genuine or AI-generated with high confidence.
+                    </p>
+                </div>
+
+                <!-- Main Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Upload Section -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold mb-4">Upload Audio File</h3>
+                            
+                            <div id="drop-zone" class="drop-zone p-8 mb-4 text-center cursor-pointer">
+                                <div class="mb-4">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-indigo-500"></i>
+                                </div>
+                                <p class="text-gray-500 mb-2">Drag & drop your audio file here</p>
+                                <p class="text-gray-400 text-sm">or</p>
+                                <button id="browse-btn" class="mt-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                                    Browse Files
+                                </button>
+                                <input type="file" id="file-input" class="hidden" accept=".wav,.mp3,.ogg,.flac">
+                            </div>
+                            
+                            <div class="text-sm text-gray-500">
+                                <p><i class="fas fa-info-circle mr-1"></i> Supported formats: WAV, MP3, OGG, FLAC</p>
+                                <p class="mt-1"><i class="fas fa-lock mr-1"></i> Your files are analyzed securely and not stored permanently</p>
+                            </div>
+                            
+                            <!-- Examples Section -->
+                            <div class="mt-6">
+                                <h4 class="text-md font-medium mb-3">Try with examples:</h4>
+                                <div class="space-y-2" id="examples-container">
+                                    <!-- Examples will be added here if available -->
+                                    <div class="animate-pulse text-gray-400 text-sm italic" id="no-examples">
+                                        No example files available
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- How it Works -->
+                        <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                            <h3 class="text-lg font-semibold mb-4">How It Works</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                        <span class="text-indigo-600 font-semibold">1</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-md font-medium">Upload Audio</h4>
+                                        <p class="text-sm text-gray-500">Upload any audio file in supported formats</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                        <span class="text-indigo-600 font-semibold">2</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-md font-medium">AI Analysis</h4>
+                                        <p class="text-sm text-gray-500">Our model extracts and analyzes audio features</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                        <span class="text-indigo-600 font-semibold">3</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-md font-medium">Get Results</h4>
+                                        <p class="text-sm text-gray-500">Receive detailed analysis with confidence score</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div class="lg:col-span-2">
+                        <!-- Initial State -->
+                        <div id="initial-state" class="bg-white rounded-lg shadow-md p-8 text-center h-full flex flex-col items-center justify-center">
+                            <img src="https://illustrations.popsy.co/amber/sound-wave.svg" alt="Audio Analysis" class="w-64 h-64 mb-6">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">Ready to Analyze</h3>
+                            <p class="text-gray-500 max-w-md">
+                                Upload an audio file to detect if it's genuine or AI-generated. 
+                                Our model will analyze the audio patterns and provide a detailed report.
+                            </p>
+                        </div>
+                        
+                        <!-- Loading State -->
+                        <div id="loading-state" class="bg-white rounded-lg shadow-md p-8 text-center h-full flex flex-col items-center justify-center hidden">
+                            <div class="audio-wave mb-6">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">Analyzing Audio...</h3>
+                            <p class="text-gray-500 max-w-md">
+                                Please wait while our AI model processes your audio file.
+                                This usually takes a few seconds.
+                            </p>
+                        </div>
+                        
+                        <!-- Error State -->
+                        <div id="error-state" class="bg-white rounded-lg shadow-md p-8 hidden">
+                            <div class="flex items-center justify-center mb-6">
+                                <div class="rounded-full bg-red-100 p-4">
+                                    <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-xl font-semibold text-center text-gray-700 mb-2">Analysis Error</h3>
+                            <p id="error-message" class="text-gray-500 text-center mb-6">
+                                An error occurred while analyzing the audio file.
+                            </p>
+                            <div class="text-center">
+                                <button id="try-again-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                                    Try Again
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Results - Real Audio -->
+                        <div id="result-real" class="bg-white rounded-lg shadow-md overflow-hidden hidden result-card">
+                            <div class="bg-green-50 p-4 border-b border-green-100">
+                                <div class="flex items-center">
+                                    <div class="rounded-full bg-green-100 p-2 mr-3">
+                                        <i class="fas fa-check text-green-500"></i>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-green-700">Authentic Audio Detected</h3>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6">
+                                <div class="flex flex-col md:flex-row items-center mb-6">
+                                    <div class="mb-4 md:mb-0 md:mr-6">
+                                        <div class="relative w-32 h-32">
+                                            <svg class="progress-ring" width="120" height="120">
+                                                <circle class="progress-ring__circle progress-ring__circle-bg" 
+                                                        stroke="#d1fae5" 
+                                                        stroke-width="8" 
+                                                        fill="transparent" 
+                                                        r="45" 
+                                                        cx="60" 
+                                                        cy="60"/>
+                                                <circle class="progress-ring__circle progress-ring__circle-real" 
+                                                        stroke="#10b981" 
+                                                        stroke-width="8" 
+                                                        fill="transparent" 
+                                                        r="45" 
+                                                        cx="60" 
+                                                        cy="60"/>
+                                            </svg>
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <span id="confidence-real" class="text-xl font-bold text-green-600">95%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-medium mb-2">Analysis Result</h4>
+                                        <p class="text-gray-600 mb-1">
+                                            This audio file appears to be <span class="font-semibold text-green-600">authentic</span> 
+                                            with high confidence.
+                                        </p>
+                                        <p class="text-gray-500 text-sm">
+                                            Our AI model detected natural audio patterns consistent with genuine recordings.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                                    <h4 class="text-md font-medium mb-3">Audio Information</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">File Name</p>
+                                            <p id="real-filename" class="font-medium truncate">audio-sample.wav</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">Duration</p>
+                                            <p id="real-duration" class="font-medium">3.45 seconds</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">Sample Rate</p>
+                                            <p id="real-samplerate" class="font-medium">44100 Hz</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">File Size</p>
+                                            <p id="real-filesize" class="font-medium">256 KB</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">Analyzed On</p>
+                                            <p id="real-timestamp" class="font-medium">2025-05-01 10:30:45</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="text-md font-medium mb-3">What This Means</h4>
+                                    <p class="text-gray-600 mb-3">
+                                        The audio file you uploaded contains characteristics typical of naturally recorded human speech.
+                                        Our model has determined with high confidence that this audio was not generated or manipulated by AI.
+                                    </p>
+                                    <div class="bg-green-50 border-l-4 border-green-400 p-4">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-info-circle text-green-500"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-green-700">
+                                                    While our model is highly accurate, it's always good practice to verify important audio 
+                                                    content through multiple methods.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Results - Fake Audio -->
+                        <div id="result-fake" class="bg-white rounded-lg shadow-md overflow-hidden hidden result-card">
+                            <div class="bg-red-50 p-4 border-b border-red-100">
+                                <div class="flex items-center">
+                                    <div class="rounded-full bg-red-100 p-2 mr-3">
+                                        <i class="fas fa-robot text-red-500"></i>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-red-700">AI-Generated Audio Detected</h3>
+                                </div>
+                            </div>
+                            
+                            <div class="p-6">
+                                <div class="flex flex-col md:flex-row items-center mb-6">
+                                    <div class="mb-4 md:mb-0 md:mr-6">
+                                        <div class="relative w-32 h-32">
+                                            <svg class="progress-ring" width="120" height="120">
+                                                <circle class="progress-ring__circle progress-ring__circle-bg" 
+                                                        stroke="#fee2e2" 
+                                                        stroke-width="8" 
+                                                        fill="transparent" 
+                                                        r="45" 
+                                                        cx="60" 
+                                                        cy="60"/>
+                                                <circle class="progress-ring__circle progress-ring__circle-fake" 
+                                                        stroke="#ef4444" 
+                                                        stroke-width="8" 
+                                                        fill="transparent" 
+                                                        r="45" 
+                                                        cx="60" 
+                                                        cy="60"/>
+                                            </svg>
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <span id="confidence-fake" class="text-xl font-bold text-red-600">95%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-medium mb-2">Analysis Result</h4>
+                                        <p class="text-gray-600 mb-1">
+                                            This audio file appears to be <span class="font-semibold text-red-600">AI-generated</span> 
+                                            with high confidence.
+                                        </p>
+                                        <p class="text-gray-500 text-sm">
+                                            Our AI model detected patterns consistent with synthetic audio generation.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                                    <h4 class="text-md font-medium mb-3">Audio Information</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">File Name</p>
+                                            <p id="fake-filename" class="font-medium truncate">audio-sample.wav</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">Duration</p>
+                                            <p id="fake-duration" class="font-medium">3.45 seconds</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">Sample Rate</p>
+                                            <p id="fake-samplerate" class="font-medium">44100 Hz</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">File Size</p>
+                                            <p id="fake-filesize" class="font-medium">256 KB</p>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border border-gray-100">
+                                            <p class="text-xs text-gray-500 mb-1">Analyzed On</p>
+                                            <p id="fake-timestamp" class="font-medium">2025-05-01 10:30:45</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="text-md font-medium mb-3">What This Means</h4>
+                                    <p class="text-gray-600 mb-3">
+                                        The audio file you uploaded contains characteristics typical of AI-generated speech.
+                                        Our model has detected patterns that are commonly found in synthetic audio created by
+                                        text-to-speech or voice cloning technologies.
+                                    </p>
+                                    <div class="bg-red-50 border-l-4 border-red-400 p-4">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-exclamation-circle text-red-500"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-red-700">
+                                                    This audio may have been created using AI voice synthesis tools. Be cautious about
+                                                    trusting the content or attributing it to a real person without verification.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200 mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="md:flex md:items-center md:justify-between">
+                    <div class="flex justify-center md:justify-start">
+                        <div class="audio-wave mr-3">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span class="text-gray-500">© 2025 DeepFake Audio Detector</span>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <p class="text-center md:text-right text-sm text-gray-500">
+                            This tool is for educational purposes only. Results should not be considered definitive proof.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const dropZone = document.getElementById('drop-zone');
+            const fileInput = document.getElementById('file-input');
+            const browseBtn = document.getElementById('browse-btn');
+            const tryAgainBtn = document.getElementById('try-again-btn');
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            // State elements
+            const initialState = document.getElementById('initial-state');
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            const resultReal = document.getElementById('result-real');
+            const resultFake = document.getElementById('result-fake');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Result elements - Real
+            const confidenceReal = document.getElementById('confidence-real');
+            const realFilename = document.getElementById('real-filename');
+            const realDuration = document.getElementById('real-duration');
+            const realSamplerate = document.getElementById('real-samplerate');
+            const realFilesize = document.getElementById('real-filesize');
+            const realTimestamp = document.getElementById('real-timestamp');
+            
+            // Result elements - Fake
+            const confidenceFake = document.getElementById('confidence-fake');
+            const fakeFilename = document.getElementById('fake-filename');
+            const fakeDuration = document.getElementById('fake-duration');
+            const fakeSamplerate = document.getElementById('fake-samplerate');
+            const fakeFilesize = document.getElementById('fake-filesize');
+            const fakeTimestamp = document.getElementById('fake-timestamp');
+            
+            // Progress ring elements
+            const progressRingReal = document.querySelector('.progress-ring__circle-real');
+            const progressRingFake = document.querySelector('.progress-ring__circle-fake');
+            
+            // Set up circle dashoffset
+            const circleRadius = 45;
+            const circumference = 2 * Math.PI * circleRadius;
+            
+            progressRingReal.style.strokeDasharray = `${circumference} ${circumference}`;
+            progressRingReal.style.strokeDashoffset = circumference;
+            
+            progressRingFake.style.strokeDasharray = `${circumference} ${circumference}`;
+            progressRingFake.style.strokeDashoffset = circumference;
+            
+            function setProgress(progressRing, percent) {
+                const offset = circumference - (percent / 100 * circumference);
+                progressRing.style.strokeDashoffset = offset;
+            }
+            
+            // Check for example files
+            fetch('/api/examples/audio.wav')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const examplesContainer = document.getElementById('examples-container');
+                        const noExamples = document.getElementById('no-examples');
+                        
+                        if (noExamples) {
+                            noExamples.remove();
+                        }
+                        
+                        const exampleBtn = document.createElement('button');
+                        exampleBtn.className = 'flex items-center p-2 w-full text-left hover:bg-gray-50 rounded';
+                        exampleBtn.innerHTML = `
+                            <i class="fas fa-play-circle text-indigo-500 mr-2"></i>
+                            <span>Sample Audio</span>
+                        `;
+                        
+                        exampleBtn.addEventListener('click', function() {
+                            analyzeExample('audio.wav');
+                        });
+                        
+                        examplesContainer.appendChild(exampleBtn);
+                    }
+                })
+                .catch(error => console.error('Error checking for examples:', error));
+            
+            // Event Listeners
+            browseBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (fileInput.files.length > 0) {
+                    handleFile(fileInput.files[0]);
+                }
+            });
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('active');
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('active');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('active');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+            
+            tryAgainBtn.addEventListener('click', () => {
+                showInitialState();
+            });
+            
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark');
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            });
+            
+            // Functions
+            function showInitialState() {
+                initialState.classList.remove('hidden');
+                loadingState.classList.add('hidden');
+                errorState.classList.add('hidden');
+                resultReal.classList.add('hidden');
+                resultFake.classList.add('hidden');
+            }
+            
+            function showLoadingState() {
+                initialState.classList.add('hidden');
+                loadingState.classList.remove('hidden');
+                errorState.classList.add('hidden');
+                resultReal.classList.add('hidden');
+                resultFake.classList.add('hidden');
+            }
+            
+            function showErrorState(message) {
+                initialState.classList.add('hidden');
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+                resultReal.classList.add('hidden');
+                resultFake.classList.add('hidden');
+                
+                errorMessage.textContent = message;
+            }
+            
+            function showResultState(result) {
+                initialState.classList.add('hidden');
+                loadingState.classList.add('hidden');
+                errorState.classList.add('hidden');
+                
+                if (result.label === 'Real') {
+                    resultReal.classList.remove('hidden');
+                    resultFake.classList.add('hidden');
+                    
+                    // Update real result details
+                    confidenceReal.textContent = result.confidence;
+                    realFilename.textContent = result.file_name;
+                    realDuration.textContent = result.audio_info.duration;
+                    realSamplerate.textContent = result.audio_info.sample_rate;
+                    realFilesize.textContent = result.audio_info.file_size;
+                    realTimestamp.textContent = result.timestamp;
+                    
+                    // Update progress ring
+                    setProgress(progressRingReal, parseFloat(result.confidence_value));
+                    
+                } else {
+                    resultReal.classList.add('hidden');
+                    resultFake.classList.remove('hidden');
+                    
+                    // Update fake result details
+                    confidenceFake.textContent = result.confidence;
+                    fakeFilename.textContent = result.file_name;
+                    fakeDuration.textContent = result.audio_info.duration;
+                    fakeSamplerate.textContent = result.audio_info.sample_rate;
+                    fakeFilesize.textContent = result.audio_info.file_size;
+                    fakeTimestamp.textContent = result.timestamp;
+                    
+                    // Update progress ring
+                    setProgress(progressRingFake, parseFloat(result.confidence_value));
+                }
+            }
+            
+            function handleFile(file) {
+                const allowedTypes = ['audio/wav', 'audio/mpeg', 'audio/ogg', 'audio/flac'];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                const allowedExtensions = ['wav', 'mp3', 'ogg', 'flac'];
+                
+                if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+                    showErrorState('Invalid file format. Please upload WAV, MP3, OGG, or FLAC files.');
+                    return;
+                }
+                
+                showLoadingState();
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                fetch('/api/analyze', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showResultState(data.result);
+                    } else {
+                        showErrorState(data.message || 'An error occurred during analysis.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorState('Network error. Please try again.');
+                });
+            }
+            
+            function analyzeExample(filename) {
+                showLoadingState();
+                
+                fetch(`/api/examples/${filename}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showResultState(data.result);
+                        } else {
+                            showErrorState(data.message || 'An error occurred during analysis.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorState('Network error. Please try again.');
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
