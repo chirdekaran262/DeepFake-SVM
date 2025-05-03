@@ -274,6 +274,7 @@ html, body, .gradio-container {
     min-width: 340px;
     max-width: 520px;
     min-height: 520px;
+    max-height: 620px;
     background: #fff;
     border-radius: 18px;
     box-shadow: 0 6px 32px rgba(99,102,241,0.10);
@@ -460,24 +461,103 @@ h2 {
     h2 { font-size: 1.05rem; }
 }
 @media (max-width: 600px) {
-    .responsive-row {
-        flex-direction: column;
-        gap: 0;
-        align-items: stretch;
-        height: unset;
-        min-height: unset;
-        margin: 0;
-    }
+    // ...existing code...
+.responsive-row {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1100px;
+    justify-content: center;
+    align-items: stretch;
+    height: 65vh; /* Reduced from 80vh */
+    min-height: 400px; /* Reduced from 500px */
+    margin: auto;
+}
+
+.centered-col, .result-col {
+    flex: 1 1 0;
+    min-width: 340px;
+    max-width: 520px;
+    height: 350px; /* Reduced from 450px */
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px rgba(99,102,241,0.10);
+    padding: 1.5rem 1.5rem; /* Reduced padding */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+@media (max-width: 900px) {
     .centered-col, .result-col {
-        max-width: 100vw;
-        padding: 1rem 0.2rem;
-        border-radius: 0;
-        margin: 0;
-        min-height: unset;
-        box-shadow: none;
+        height: auto;
+        min-height: 300px; /* Reduced from 400px */
+        margin: 0.8rem auto;
+        padding: 1.2rem 0.7rem;
     }
+}
+// ...existing code...
     h1 { font-size: 1.1rem; }
     h2 { font-size: 0.97rem; }
+}
+// Add this CSS to your modern_css string
+.footer {
+    width: 100%;
+    background: linear-gradient(90deg, #4f46e5 0%, #6366f1 100%);
+    padding: 2rem 1rem;
+    margin-top: 3rem;
+    box-shadow: 0 -4px 16px rgba(99,102,241,0.1);
+    position: relative;  /* Add this */
+    z-index: 10;        /* Add this */
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    color: #fff;
+    background: inherit;  /* Add this */
+}
+
+.footer-section {
+    padding: 0 1rem;
+    background: transparent;  /* Add this */
+}
+
+/* Remove the background-color: coral; from the footer class as it conflicts with the gradient */
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.2);  /* Made more visible */
+    color: #fff;           /* Changed to pure white */
+    font-size: 0.9rem;
+    background: inherit;   /* Add this */
+}
+
+/* Add this new style for stronger text contrast */
+.footer-section h3,
+.footer-section p,
+.footer-section a {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.social-links a {
+    color: #fff;
+    font-size: 1.5rem;    /* Made slightly larger */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.social-links a:hover {
+    transform: translateY(-2px);
 }
 """
 
@@ -498,10 +578,36 @@ with gr.Blocks(css=modern_css, theme=gr.themes.Base()) as demo:
             result_output = gr.HTML(label="", elem_id="result_card")
             status_indicator_output = gr.HTML(label="", elem_id="status_indicator")
     # Footer
+    # Replace the existing footer HTML with this
     gr.HTML("""
-    <div style="text-align:center; color:#64748b; margin-top:2rem; font-size:0.97rem;">
-        © 2025 DeepFake Audio Detector. For educational use only.
-    </div>
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Us</h3>
+                    <p>DeepFake Audio Detector is an advanced AI-powered tool designed to identify artificially generated audio content with high accuracy.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <p><a href="#">Documentation</a></p>
+                    <p><a href="#">Privacy Policy</a></p>
+                    <p><a href="#">Terms of Service</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: info@deepfakedetector.ai</p>
+                    <p>Support: support@deepfakedetector.ai</p>
+                    <div class="social-links">
+                        <a href="#" title="Twitter">🐦</a>
+                        <a href="#" title="GitHub">📚</a>
+                        <a href="#" title="LinkedIn">💼</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 DeepFake Audio Detector. All rights reserved.</p>
+            </div>
+        </div>
+        
     """)
     # Event handlers
     analyze_btn.click(
