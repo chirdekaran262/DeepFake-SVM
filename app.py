@@ -264,12 +264,16 @@ html, body, .gradio-container {
     width: 100%;
     max-width: 1100px;
     justify-content: center;
-    align-items: flex-start;
+    align-items: stretch;
+    height: 100vh;
+    min-height: 600px;
+    margin: auto; /* Center the row vertically and horizontally */
 }
-.centered-col {
+.centered-col, .result-col {
     flex: 1 1 0;
-    min-width: 320px;
+    min-width: 340px;
     max-width: 520px;
+    min-height: 520px;
     background: #fff;
     border-radius: 18px;
     box-shadow: 0 6px 32px rgba(99,102,241,0.10);
@@ -277,20 +281,8 @@ html, body, .gradio-container {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    margin: 2.5rem 0 0 0;
-}
-.result-col {
-    flex: 1 1 0;
-    min-width: 320px;
-    max-width: 520px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 6px 32px rgba(99,102,241,0.10);
-    padding: 2.5rem 2rem 2rem 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    margin: 2.5rem 0 0 0;
+    /* Remove margin: auto 0; */
+    box-sizing: border-box;
 }
 h1 {
     text-align: center;
@@ -431,9 +423,22 @@ h2 {
     text-align: center;
     font-weight: 600;
 }
+.gradio-container .gr-audio {
+    width: 100% !important;
+    min-height: 120px !important;
+    max-height: 180px !important;
+    background: #f1f5f9 !important;
+    border-radius: 12px !important;
+    border: 2px dashed #c7d2fe !important;
+    margin-bottom: 1.2rem !important;
+    box-sizing: border-box !important;
+}
 @media (max-width: 1100px) {
     .responsive-row {
         gap: 1rem;
+        height: unset;
+        min-height: unset;
+        margin: 0;
     }
 }
 @media (max-width: 900px) {
@@ -441,11 +446,15 @@ h2 {
         flex-direction: column;
         gap: 0;
         align-items: stretch;
+        height: unset;
+        min-height: unset;
+        margin: 0;
     }
     .centered-col, .result-col {
         max-width: 98vw;
         margin: 1.5rem auto 0 auto;
         padding: 1.5rem 0.7rem;
+        min-height: unset;
     }
     h1 { font-size: 1.5rem; }
     h2 { font-size: 1.05rem; }
@@ -455,6 +464,9 @@ h2 {
         flex-direction: column;
         gap: 0;
         align-items: stretch;
+        height: unset;
+        min-height: unset;
+        margin: 0;
     }
     .centered-col, .result-col {
         max-width: 100vw;
