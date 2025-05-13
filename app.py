@@ -646,12 +646,18 @@ a:hover { color: var(--color-primary-700); }
 
 /* Result Card Color Variants */
 .analysis-result-card.result-real { border-left-color: var(--color-success-500); }
-.result-real .result-status-badge { background-color: var(--color-success-50); color: var(--color-success-700); }
+.result-real .result-status-badge { 
+    background-color: var(--color-success-500); /* Changed from success-50 to success-500 */
+    color: var(--color-white); /* Changed to white for better contrast */
+}
 .result-real .confidence-bar-fill { background-color: var(--color-success-500); }
 .result-real .confidence-value { color: var(--color-success-700); }
 
 .analysis-result-card.result-fake { border-left-color: var(--color-danger-500); }
-.result-fake .result-status-badge { background-color: var(--color-danger-50); color: var(--color-danger-700); }
+.result-fake .result-status-badge { 
+    background-color: var(--color-danger-500); /* Changed from danger-50 to danger-500 */
+    color: var(--color-white); /* Changed to white for better contrast */
+}
 .result-fake .confidence-bar-fill { background-color: var(--color-danger-500); }
 .result-fake .confidence-value { color: var(--color-danger-700); }
 
